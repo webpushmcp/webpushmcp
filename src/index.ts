@@ -1,65 +1,141 @@
-import { DurableObject } from "cloudflare:workers";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { z } from "zod";
+import { PushSubscriptionStore } from "./store/durable-object";
+import { buildPushPayload } from "@block65/webcrypto-web-push";
+
+export { PushSubscriptionStore };
 
 /**
- * Welcome to Cloudflare Workers! This is your first Durable Objects application.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your Durable Object in action
- * - Run `npm run deploy` to publish your application
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/durable-objects
+ * Factory to create a fresh MCP server instance for each request.
+ * This prevents "Already connected to a transport" errors in stateless environments.
  */
+function createMcpServer(env: Env) {
+  const server = new McpServer({
+    name: "webpush-native-mcp",
+    version: "1.0.0",
+  });
 
+  server.tool(
+    "send_notification",
+    "Send a browser push notification to a registered client",
+    {
+      clientId: z.string().describe("Unique client ID from subscription page"),
+      title: z.string().max(200).describe("Notification title"),
+      body: z.string().max(4000).describe("Notification body text"),
+      url: z.string().url().optional().describe("URL to open on click"),
+    },
+    async ({ clientId, title, body, url }) => {
+      const stub = env.PUSH_STORE.get(env.PUSH_STORE.idFromName(clientId));
+      const sub = await stub.getSubscription(clientId);
+      if (!sub) return { content: [{ type: "text", text: `Client ${clientId} not found` }], isError: true };
 
-/** A Durable Object's behavior is defined in an exported Javascript class */
-export class MyDurableObject extends DurableObject {
-	/**
-	 * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
-	 * 	`DurableObjectStub::get` for a given identifier (no-op constructors can be omitted)
-	 *
-	 * @param ctx - The interface for interacting with Durable Object state
-	 * @param env - The interface to reference bindings declared in wrangler.jsonc
-	 */
-	constructor(ctx: DurableObjectState, env: Env) {
-		super(ctx, env);
-	}
+      try {
+        const message = await buildPushPayload(
+          {
+            data: JSON.stringify({ 
+              title, 
+              body, 
+              data: { url: url || "/" } 
+            })
+          },
+          {
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth }
+          },
+          {
+            subject: env.VAPID_SUBJECT,
+            publicKey: env.VAPID_PUBLIC_KEY,
+            privateKey: env.VAPID_PRIVATE_KEY
+          }
+        );
+        
+        const res = await fetch(sub.endpoint, message);
+        const resText = await res.text();
+        
+        if (!res.ok) {
+          return { 
+            content: [{ type: "text", text: `Push service error: ${res.status} ${resText}` }], 
+            isError: true 
+          };
+        }
+        
+        return { 
+          content: [{ 
+            type: "text", 
+            text: `Notification sent to ${clientId}. Service response: ${res.status} ${resText || "(no body)"}` 
+          }] 
+        };
+      } catch (e: any) {
+        return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
+      }
+    }
+  );
 
-	/**
-	 * The Durable Object exposes an RPC method sayHello which will be invoked when a Durable
-	 *  Object instance receives a request from a Worker via the same method invocation on the stub
-	 *
-	 * @param name - The name provided to a Durable Object instance from a Worker
-	 * @returns The greeting to be sent back to the Worker
-	 */
-	async sayHello(name: string): Promise<string> {
-		return `Hello, ${name}!`;
-	}
+  return server;
 }
 
 export default {
-	/**
-	 * This is the standard fetch handler for a Cloudflare Worker
-	 *
-	 * @param request - The request submitted to the Worker from the client
-	 * @param env - The interface to reference bindings declared in wrangler.jsonc
-	 * @param ctx - The execution context of the Worker
-	 * @returns The response to be sent back to the client
-	 */
-	async fetch(request, env, ctx): Promise<Response> {
-		// Create a stub to open a communication channel with the Durable Object
-		// instance named "foo".
-		//
-		// Requests from all Workers to the Durable Object instance named "foo"
-		// will go to a single remote Durable Object instance.
-		const stub = env.MY_DURABLE_OBJECT.getByName("foo");
+  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    const url = new URL(request.url);
 
-		// Call the `sayHello()` RPC method on the stub to invoke the method on
-		// the remote Durable Object instance.
-		const greeting = await stub.sayHello("world");
+    // Standard MCP JSON-RPC over HTTP
+    if (url.pathname === "/mcp") {
+      const transport = new WebStandardStreamableHTTPServerTransport({
+        sessionIdGenerator: undefined, // Stateless mode
+        enableJsonResponse: true
+      });
 
-		return new Response(greeting);
-	},
-} satisfies ExportedHandler<Env>;
+      const server = createMcpServer(env);
+      await server.connect(transport);
+
+      const modifiedRequest = new Request(request, {
+        headers: new Headers(request.headers)
+      });
+      // Always set this to satisfy the transport's strict specification check
+      modifiedRequest.headers.set("Accept", "application/json, text/event-stream");
+
+      return transport.handleRequest(modifiedRequest);
+    }
+
+    if (url.pathname === "/api/vapid-public-key") {
+      return new Response(env.VAPID_PUBLIC_KEY, {
+        headers: { "Access-Control-Allow-Origin": "*" }
+      });
+    }
+
+    if (url.pathname === "/api/subscribe" && request.method === "POST") {
+      try {
+        const { endpoint, keys } = await request.json() as any;
+        const clientId = crypto.randomUUID();
+        const stub = env.PUSH_STORE.get(env.PUSH_STORE.idFromName(clientId));
+        await stub.saveSubscription(clientId, endpoint, keys.p256dh, keys.auth);
+        return new Response(JSON.stringify({ clientId }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+      } catch (e: any) {
+        return new Response(e.message, { status: 400 });
+      }
+    }
+
+    if (url.pathname.startsWith("/api/subscription/") && request.method === "DELETE") {
+      const clientId = url.pathname.split("/").pop()!;
+      const stub = env.PUSH_STORE.get(env.PUSH_STORE.idFromName(clientId));
+      await stub.deleteSubscription(clientId);
+      return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": "*" } });
+    }
+
+    // CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, GET, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Accept"
+        }
+      });
+    }
+
+    return new Response("Not found", { status: 404 });
+  },
+};

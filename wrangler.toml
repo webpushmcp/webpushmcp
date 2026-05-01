@@ -1,0 +1,18 @@
+name = "webpush-native-mcp"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+
+[[durable_objects.bindings]]
+class_name = "PushSubscriptionStore"
+name = "PUSH_STORE"
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["PushSubscriptionStore"]
+
+[vars]
+VAPID_SUBJECT = "mailto:admin@webpush-native-mcp.workers.dev"
