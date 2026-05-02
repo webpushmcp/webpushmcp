@@ -43,7 +43,12 @@ function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', messa
 }
 
 async function init() {
-  elements.mcpUrlDisplay.textContent = window.location.origin + '/mcp';
+  const mcpUrl = window.location.origin + '/mcp';
+  elements.mcpUrlDisplay.textContent = mcpUrl;
+  
+  document.querySelectorAll('.mcp-url-placeholder').forEach(el => {
+    el.textContent = mcpUrl;
+  });
   
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     updateStatus('error', 'Push notifications not supported in this browser.');

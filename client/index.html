@@ -1,97 +1,230 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebPush Native MCP</title>
+    <title>Native Push MCP | AI-Powered Browser Notifications</title>
+    <meta name="description" content="Empower your AI agents to send native browser push notifications via Model Context Protocol. Simple, secure, and developer-friendly.">
+    <meta name="keywords" content="MCP, Model Context Protocol, Web Push, Notifications, AI Agents, Cloudflare Workers">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="/logo.png">
     <link rel="stylesheet" href="/src/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col items-center justify-center p-6 selection:bg-indigo-500/30">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <div class="max-w-2xl w-full space-y-12">
-        <!-- Header -->
-        <header class="text-center space-y-4 animate-in fade-in slide-in-from-top-8 duration-1000">
-            <h1 class="text-5xl font-extrabold tracking-tight bg-gradient-to-br from-white to-slate-500 bg-clip-text text-transparent">
-                Native Push MCP
-            </h1>
-            <p class="text-slate-400 text-lg max-w-md mx-auto">
-                Receive browser-native notifications directly from your AI agents. Simple, private, and framework-free.
-            </p>
-        </header>
+    <!-- AIO: Structured Data for AI Discovery -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Native Push MCP",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "description": "Send native browser push notifications from your AI agents via Model Context Protocol.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "100% Free & Open Source",
+        "No Account or Registration Required",
+        "Native Browser Push Notifications",
+        "Seamless AI Agent Integration",
+        "Secure & Private Data Handling"
+      ]
+    }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-200 font-inter antialiased">
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,#312e81,transparent)] pointer-events-none"></div>
 
-        <!-- Main Card -->
-        <main class="relative group animate-in fade-in zoom-in-95 duration-700 delay-300 fill-mode-both">
-            <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-            
-            <div class="relative bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl space-y-8">
-                
-                <!-- Status & Action -->
-                <div id="status-container" class="space-y-6 text-center">
-                    <div id="subscription-status" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700 text-sm text-slate-400">
-                        <span class="w-2 h-2 rounded-full bg-slate-600 animate-pulse"></span>
-                        <span>Checking status...</span>
+    <header class="relative z-10 max-w-5xl mx-auto px-6 pt-12 md:pt-20 pb-12 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 rounded-full border border-indigo-500/20 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Free & Open Source</span>
+        </div>
+        
+        <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-8">
+            <div class="p-3 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl shadow-indigo-500/10">
+                <img src="/logo.png" alt="Logo" class="w-12 h-12 md:w-16 md:h-16">
+            </div>
+            <div class="text-center md:text-left">
+                <h1 class="font-outfit text-4xl md:text-6xl font-bold tracking-tight text-white">
+                    Notifications for <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400">AI Agents</span>
+                </h1>
+                <p class="text-lg text-slate-400 max-w-xl leading-relaxed mt-2">
+                    Instant alerts on any device. 100% Free. No registration. Notifications arrive even when your browser is closed.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-5xl mx-auto px-6 pb-12 space-y-12">
+        
+        <!-- Registration Section -->
+        <section id="setup" class="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/5 p-6 md:p-10 shadow-2xl">
+            <div class="grid lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <h2 class="font-outfit text-2xl md:text-3xl font-semibold text-white">Instant Setup</h2>
+                    <p class="text-slate-400 text-sm md:text-base leading-relaxed">
+                        Enable notifications for this device in one click. 100% Free & Open Source. No registration required. Uses standard browser APIs to work even when this page is closed.
+                    </p>
+                    <div id="status-container">
+                      <div id="subscription-status" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700 text-xs text-slate-400">
+                          <span class="w-1.5 h-1.5 rounded-full bg-slate-600 animate-pulse"></span>
+                          <span>Checking status...</span>
+                      </div>
                     </div>
-
-                    <div class="flex flex-col items-center gap-4">
-                        <button id="subscribe-btn" class="hidden px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg shadow-indigo-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                            Enable Push Notifications
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button id="subscribe-btn" class="hidden px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-indigo-600/20 text-sm">
+                            Enable Notifications
                         </button>
-                        
-                        <div id="client-id-card" class="hidden w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div class="p-6 bg-slate-950/50 border border-slate-800 rounded-2xl space-y-2">
-                                <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Your Client ID</label>
-                                <div class="flex items-center gap-3">
-                                    <code id="client-id-display" class="flex-1 font-mono text-indigo-400 truncate">Loading...</code>
-                                    <button id="copy-id-btn" class="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400 hover:text-white" title="Copy Client ID">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <button id="test-push-btn" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-sm font-medium rounded-xl transition-colors border border-slate-700 active:scale-95">
-                                    Send Test Push
-                                </button>
-                                <button id="unsubscribe-btn" class="px-6 py-3 text-slate-500 hover:text-red-400 text-sm font-medium transition-colors active:scale-95">
-                                    Unsubscribe
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <div class="border-t border-slate-800 pt-8 space-y-4">
-                    <h3 class="text-sm font-semibold text-slate-300">Agent Configuration</h3>
-                    <div class="p-4 bg-slate-950/50 rounded-xl space-y-3">
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            Give this URL to your AI agent as an MCP server endpoint. They can then use the <code>send_notification</code> tool with your Client ID.
-                        </p>
-                        <div class="flex items-center gap-3 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
-                            <code id="mcp-url-display" class="text-xs text-indigo-400/80 truncate"></code>
-                            <button id="copy-mcp-btn" class="text-slate-500 hover:text-white transition-colors">
+                <div id="client-id-card" class="hidden space-y-4 animate-in slide-in-from-right duration-500 bg-slate-950/40 p-5 rounded-2xl border border-white/5">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Your Client ID</label>
+                        <div class="group relative flex items-center bg-slate-950 rounded-xl border border-white/10 p-3 transition-colors hover:border-indigo-500/50">
+                            <code id="client-id-display" class="text-indigo-400 font-mono text-xs overflow-hidden text-ellipsis">Generating...</code>
+                            <button id="copy-id-btn" class="ml-auto p-1.5 text-slate-500 hover:text-white transition-colors" title="Copy ID">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                             </button>
                         </div>
                     </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">MCP Endpoint</label>
+                        <div class="group relative flex items-center bg-slate-950 rounded-xl border border-white/10 p-3 transition-colors hover:border-indigo-500/50">
+                            <code id="mcp-url-display" class="text-violet-400 font-mono text-xs overflow-hidden text-ellipsis">http://.../mcp</code>
+                            <button id="copy-mcp-btn" class="ml-auto p-1.5 text-slate-500 hover:text-white transition-colors" title="Copy URL">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                      <button id="test-push-btn" class="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-xl shadow-xl shadow-indigo-900/20 hover:shadow-indigo-500/20 transition-all text-xs">
+                          Send Test
+                      </button>
+                      <button id="unsubscribe-btn" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold rounded-xl transition-all text-xs">
+                          Unsubscribe
+                      </button>
+                    </div>
                 </div>
             </div>
-        </main>
+        </section>
 
-        <!-- Footer -->
-        <footer class="text-center">
-            <a href="https://github.com/bernd/webpush-native-mcp" target="_blank" class="text-slate-600 hover:text-indigo-400 text-xs transition-colors">
-                View on GitHub
-            </a>
-        </footer>
-    </div>
+        <!-- Configuration Section -->
+        <section id="config" class="space-y-6">
+            <h2 class="font-outfit text-2xl font-semibold text-white text-center">Connect Your Agent</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Claude Desktop -->
+                <div class="bg-slate-900/40 rounded-3xl border border-white/5 p-6 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/><path d="M8 15h6"/></svg>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Claude Desktop</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-500">Add to your <code class="text-slate-300">claude_desktop_config.json</code>:</p>
+                    <div class="relative group">
+                        <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 text-[10px] text-indigo-300 font-mono overflow-x-auto">
+{
+  "mcpServers": {
+    "webpush": {
+      "url": "<span class="mcp-url-placeholder">YOUR_URL</span>"
+    }
+  }
+}</pre>
+                    </div>
+                </div>
+
+                <!-- Cursor -->
+                <div class="bg-slate-900/40 rounded-3xl border border-white/5 p-6 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-violet-500/10 rounded-lg text-violet-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Cursor / IDEs</h3>
+                    </div>
+                    <ul class="text-[11px] text-slate-500 space-y-2 list-disc list-inside">
+                        <li>Open <span class="text-slate-300">Settings > Features > MCP</span></li>
+                        <li>Click <span class="text-slate-300">+ Add Server</span></li>
+                        <li>Type: <span class="text-indigo-400 font-bold">SSE</span></li>
+                        <li>URL: <span class="text-indigo-400 font-bold mcp-url-placeholder">YOUR_URL</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Instructions Section -->
+        <section id="instructions" class="grid sm:grid-cols-3 gap-4 md:gap-6">
+            <article class="p-6 bg-slate-900/20 rounded-2xl border border-white/5 space-y-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="text-indigo-400">01.</span> Humans
+                </h3>
+                <ol class="text-slate-400 text-xs space-y-1 list-decimal list-inside leading-relaxed">
+                    <li>Enable notifications</li>
+                    <li>Copy Client ID</li>
+                    <li>Pass to your Agent</li>
+                </ol>
+            </article>
+
+            <article class="p-6 bg-slate-900/20 rounded-2xl border border-white/5 space-y-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="text-violet-400">02.</span> Agents
+                </h3>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    Agent uses <code class="text-violet-300">send_notification</code> with your ID via MCP.
+                </p>
+            </article>
+
+            <article class="p-6 bg-slate-900/20 rounded-2xl border border-white/5 space-y-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="text-fuchsia-400">03.</span> Privacy
+                </h3>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    Encrypted storage on global edge nodes. No logs, no tracking.
+                </p>
+            </article>
+        </section>
+
+        <!-- Use Case Section -->
+        <section id="why" class="grid md:grid-cols-2 gap-4">
+            <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 flex gap-4 items-start">
+                <div class="p-2 bg-indigo-500/10 rounded-lg text-indigo-400 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Open Source & Free</h4>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">Built for the community. Use for free, forever. Deploy yourself or use ours.</p>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 flex gap-4 items-start">
+                <div class="p-2 bg-violet-500/10 rounded-lg text-violet-400 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">No Account Needed</h4>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">No emails, no data collection. Just click enable and start receiving.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="relative z-10 max-w-5xl mx-auto px-6 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-[10px]">
+        <p>&copy; 2026 Native Push MCP. Cloudflare Edge Powered.</p>
+        <div class="flex gap-4">
+          <a href="https://github.com/bernd/webpush-native-mcp" target="_blank" class="hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold">GitHub</a>
+          <a href="/manifest.json" class="hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold">Manifest</a>
+        </div>
+    </footer>
 
     <script type="module" src="/src/main.ts"></script>
 </body>
