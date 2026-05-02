@@ -43,7 +43,7 @@
     "production": {
       "routes": [
         {
-          "pattern": "webpushmcp.com/*",
+          "pattern": "webpushmcp.com",
           "custom_domain": true
         }
       ],
