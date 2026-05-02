@@ -24,9 +24,10 @@ const elements = {
   unsubscribeBtn: document.getElementById('unsubscribe-btn')! as HTMLButtonElement,
   configLocked: document.getElementById('config-locked')!,
   configUnlocked: document.getElementById('config-unlocked')!,
-  toastContainer: document.getElementById('toast-container')!,
-  toastTitle: document.getElementById('toast-title')!,
-  toastBody: document.getElementById('toast-body')!,
+  notifHero: document.getElementById('notification-hero')!,
+  heroTitle: document.getElementById('hero-title')!,
+  heroBody: document.getElementById('hero-body')!,
+  closeHeroBtn: document.getElementById('close-hero-btn')!,
 };
 
 function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', message: string) {
@@ -56,24 +57,25 @@ function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', messa
   }
 }
 
-function showToast(title: string, body: string) {
-  elements.toastTitle.textContent = title;
-  elements.toastBody.textContent = body;
-  elements.toastContainer.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
-  
-  setTimeout(() => {
-    elements.toastContainer.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
-  }, 5000);
+function showHero(title: string, body: string) {
+  elements.heroTitle.textContent = title;
+  elements.heroBody.textContent = body;
+  elements.notifHero.classList.remove('hidden');
 }
 
 async function init() {
+  // Close hero handler
+  elements.closeHeroBtn.addEventListener('click', () => {
+    elements.notifHero.classList.add('hidden');
+  });
+
   // Check for notification parameters
   const params = new URLSearchParams(window.location.search);
   const notifTitle = params.get('notif_title');
   const notifBody = params.get('notif_body');
   
   if (notifTitle) {
-    showToast(notifTitle, notifBody || '');
+    showHero(notifTitle, notifBody || '');
     // Clean up URL
     const cleanUrl = window.location.pathname + window.location.hash;
     window.history.replaceState({}, document.title, cleanUrl);
