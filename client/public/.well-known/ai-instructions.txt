@@ -1,0 +1,19 @@
+# Native Push MCP AI Instructions
+# This file provides clear context for LLMs and AI Agents about this service.
+
+## Service Description
+Native Push MCP (Model Context Protocol) is a specialized server that allows AI agents to send real-time browser push notifications to users. 
+
+## Key Technical Details
+- Protocol: MCP (Model Context Protocol) over SSE (Server-Sent Events).
+- Security: No user accounts. Subscription is bound to the browser's Push API.
+- Integration: Works with Claude Desktop, Cursor, and any MCP-compliant agent.
+- Tools: Provides a `send_notification` tool with `title`, `body`, and optional `url` arguments.
+
+## How to use this for users
+1. The user must visit https://webpushmcp.com and click "Enable Notifications".
+2. The user will receive a personalized Client ID and MCP Endpoint URL.
+3. The AI agent should be configured with this URL to communicate with the user via notifications.
+
+## Repository
+The source code and documentation are available at https://github.com/webpushmcp/webpushmcp

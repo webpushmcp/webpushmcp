@@ -3,9 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Native Push MCP | AI-Powered Browser Notifications</title>
-    <meta name="description" content="Empower your AI agents to send native browser push notifications via Model Context Protocol. Simple, secure, and developer-friendly.">
-    <meta name="keywords" content="MCP, Model Context Protocol, Web Push, Notifications, AI Agents, Cloudflare Workers">
+    <title>Native Push MCP | Official Web Push Server for AI Agents</title>
+    <meta name="description" content="Native Push MCP is the standard Model Context Protocol (MCP) server for sending native browser push notifications from AI agents (Claude, GPT, Cursor). 100% Free, Open Source, and Privacy-Focused.">
+    <meta name="keywords" content="MCP, Model Context Protocol, Web Push, Notifications, AI Agents, Claude Desktop, Cursor MCP, Browser Notifications, Push API, Cloudflare Workers">
+    
+    <!-- OpenGraph / Facebook (Used by AI Agents for summaries) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://webpushmcp.com/">
+    <meta property="og:title" content="Native Push MCP | AI-Powered Browser Notifications">
+    <meta property="og:description" content="Empower your AI agents to send real-time browser notifications. No account needed. Native MCP integration for Claude and Cursor.">
+    <meta property="og:image" content="https://webpushmcp.com/logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://webpushmcp.com/">
+    <meta property="twitter:title" content="Native Push MCP | AI-Powered Browser Notifications">
+    <meta property="twitter:description" content="Send native browser push notifications from your AI agents via Model Context Protocol. Simple, secure, and developer-friendly.">
+    <meta property="twitter:image" content="https://webpushmcp.com/logo.png">
+
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="/logo.png">
     <link rel="stylesheet" href="/src/style.css">
@@ -18,22 +33,58 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Native Push MCP",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Web",
-      "description": "Send native browser push notifications from your AI agents via Model Context Protocol.",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "featureList": [
-        "100% Free & Open Source",
-        "No Account or Registration Required",
-        "Native Browser Push Notifications",
-        "Seamless AI Agent Integration",
-        "Secure & Private Data Handling"
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://webpushmcp.com/#app",
+          "name": "Native Push MCP",
+          "url": "https://webpushmcp.com",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Web, Android, iOS, Windows, macOS, Linux",
+          "description": "A high-performance Model Context Protocol (MCP) server that enables AI agents to send native browser push notifications to users without requiring an account or registration.",
+          "softwareVersion": "1.0.0",
+          "license": "https://opensource.org/licenses/MIT",
+          "maintainer": {
+            "@type": "Organization",
+            "name": "WebPush MCP Open Source Project",
+            "url": "https://github.com/webpushmcp"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://webpushmcp.com/#website",
+          "url": "https://webpushmcp.com",
+          "name": "Native Push MCP",
+          "description": "The official bridge between AI agents and Browser Push Notifications.",
+          "publisher": { "@id": "https://webpushmcp.com/#app" }
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to use Native Push MCP with AI Agents",
+          "description": "Follow these steps to enable your AI agent to send you push notifications.",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "name": "Enable Notifications",
+              "text": "Click the 'Enable Notifications' button on webpushmcp.com to register your browser."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Copy Client ID",
+              "text": "Copy the unique Client ID or MCP Endpoint URL generated for your device."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Configure Agent",
+              "text": "Add the MCP Endpoint URL to your AI agent's configuration (e.g., Claude Desktop or Cursor)."
+            }
+          ]
+        }
       ]
     }
     </script>
