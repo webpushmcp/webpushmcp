@@ -16,3 +16,10 @@ new_sqlite_classes = ["PushSubscriptionStore"]
 
 [vars]
 VAPID_SUBJECT = "mailto:admin@webpush-native-mcp.workers.dev"
+
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+[ratelimits.simple]
+limit = 10
+period = 60

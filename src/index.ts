@@ -3,6 +3,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { z } from "zod";
 import { PushSubscriptionStore } from "./store/durable-object";
 import { buildPushPayload } from "@block65/webcrypto-web-push";
+import { getRateLimitKeys } from "./mcp/rate-limit";
 
 export { PushSubscriptionStore };
 
@@ -102,6 +103,26 @@ async function sendPush(
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
+
+    // Layered Rate Limiting:
+    // 1. Check IP-based "ceiling" (stops random ID spam from one source)
+    // 2. Check ClientID-based limit (ensures user isolation)
+    const { ipKey, clientIdKey } = getRateLimitKeys(url, request.headers);
+    
+    // Always check IP limit
+    const ipCheck = await env.RATE_LIMITER.limit({ key: ipKey });
+    if (!ipCheck.success) {
+      return new Response("Too many requests from this IP", { status: 429, headers: { "Access-Control-Allow-Origin": "*" } });
+    }
+
+    // Additionally check ClientID limit if present
+    if (clientIdKey) {
+      const idCheck = await env.RATE_LIMITER.limit({ key: clientIdKey });
+      if (!idCheck.success) {
+        return new Response("Too many requests for this client", { status: 429, headers: { "Access-Control-Allow-Origin": "*" } });
+      }
+    }
+
 
     // Personalized MCP endpoint: /mcp/:clientId
     const personalizedMatch = url.pathname.match(/^\/mcp\/([\w-]+)$/);
