@@ -24,6 +24,9 @@ const elements = {
   unsubscribeBtn: document.getElementById('unsubscribe-btn')! as HTMLButtonElement,
   configLocked: document.getElementById('config-locked')!,
   configUnlocked: document.getElementById('config-unlocked')!,
+  toastContainer: document.getElementById('toast-container')!,
+  toastTitle: document.getElementById('toast-title')!,
+  toastBody: document.getElementById('toast-body')!,
 };
 
 function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', message: string) {
@@ -53,7 +56,29 @@ function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', messa
   }
 }
 
+function showToast(title: string, body: string) {
+  elements.toastTitle.textContent = title;
+  elements.toastBody.textContent = body;
+  elements.toastContainer.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+  
+  setTimeout(() => {
+    elements.toastContainer.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+  }, 5000);
+}
+
 async function init() {
+  // Check for notification parameters
+  const params = new URLSearchParams(window.location.search);
+  const notifTitle = params.get('notif_title');
+  const notifBody = params.get('notif_body');
+  
+  if (notifTitle) {
+    showToast(notifTitle, notifBody || '');
+    // Clean up URL
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
   const mcpUrl = window.location.origin + '/mcp';
   elements.mcpUrlDisplay.textContent = mcpUrl;
   

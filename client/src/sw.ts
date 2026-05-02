@@ -14,12 +14,7 @@ self.addEventListener('push', (event) => {
   if (!event.data) return;
 
   try {
-    const rawData = event.data?.text();
-    console.log('Push received, raw data:', rawData);
-    
     const payload = event.data?.json();
-    console.log('Parsed payload:', payload);
-    
     const { title, body, data } = payload;
     
     event.waitUntil(
@@ -27,7 +22,11 @@ self.addEventListener('push', (event) => {
         body: body || '',
         icon: '/logo-128.png',
         badge: '/badge-96.png',
-        data: data || {},
+        data: {
+          ...(data || {}),
+          _title: title,
+          _body: body
+        },
         requireInteraction: true
       })
     );
@@ -44,14 +43,24 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
-  const url = event.notification.data?.url || '/';
+  const data = event.notification.data;
+  let targetUrl = data?.url || '/';
+  
+  // If it's a local URL, append the message content as query params
+  if (targetUrl.startsWith('/') || targetUrl.startsWith(self.location.origin)) {
+    const url = new URL(targetUrl, self.location.origin);
+    if (data._title) url.searchParams.set('notif_title', data._title);
+    if (data._body) url.searchParams.set('notif_body', data._body);
+    targetUrl = url.toString();
+  }
   
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // If a window is already open at this URL, focus it (and update its URL to show the message)
       for (const client of clientList) {
-        if (client.url === url && 'focus' in client) return client.focus();
+        if (client.url === targetUrl && 'focus' in client) return client.focus();
       }
-      if (self.clients.openWindow) return self.clients.openWindow(url);
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
     })
   );
 });
