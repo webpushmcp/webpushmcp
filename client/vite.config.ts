@@ -10,6 +10,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
+        legal: resolve(__dirname, 'legal.html'),
         sw: resolve(__dirname, 'src/sw.ts'),
       },
       output: {

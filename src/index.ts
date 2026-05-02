@@ -65,7 +65,7 @@ async function sendPush(
         data: JSON.stringify({ 
           title, 
           body, 
-          data: { url: url || "/" } 
+          data: { url: url || env.BASE_URL || "/" } 
         })
       },
       {
