@@ -27,7 +27,12 @@ const elements = {
 };
 
 function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', message: string) {
-  elements.statusText.textContent = message;
+  elements.statusText.innerHTML = message;
+  
+  if (status === 'error') {
+    elements.statusText.innerHTML += ` <a href="#mobile-guide" class="text-indigo-400 underline ml-1 font-bold">Need help?</a>`;
+  }
+
   elements.statusDot.className = 'w-2 h-2 rounded-full ' + ({
     idle: 'bg-slate-600',
     subscribed: 'bg-emerald-500',
@@ -91,20 +96,29 @@ async function subscribe() {
   updateStatus('loading', 'Subscribing...');
   
   try {
+    updateStatus('loading', 'Requesting permission...');
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') throw new Error(`Notification permission ${permission}`);
+
+    updateStatus('loading', 'Fetching VAPID key...');
     const res = await fetch('/api/vapid-public-key');
+    if (!res.ok) throw new Error(`VAPID key fetch failed: ${res.status}`);
     const vapidPublicKey = await res.text();
     
+    updateStatus('loading', 'Registering push...');
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
     });
     
+    updateStatus('loading', 'Saving subscription...');
     const subResponse = await fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(subscription.toJSON())
     });
+    if (!subResponse.ok) throw new Error(`Subscribe API failed: ${subResponse.status}`);
     
     const { clientId } = await subResponse.json() as { clientId: string };
     localStorage.setItem('push_mcp_clientId', clientId);
@@ -115,9 +129,9 @@ async function subscribe() {
     document.querySelectorAll('.client-id-placeholder').forEach(el => { el.textContent = clientId; });
     
     updateStatus('subscribed', 'Successfully registered!');
-  } catch (err) {
+  } catch (err: any) {
     console.error('Subscription failed:', err);
-    updateStatus('error', 'Subscription failed. Check console.');
+    updateStatus('error', `Failed: ${err?.message || err}`);
   }
 }
 
