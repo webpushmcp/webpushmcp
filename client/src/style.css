@@ -12,7 +12,6 @@
   
   body {
     @apply selection:bg-indigo-500/30 selection:text-white;
-    animation: scale-up 0.5s ease-out;
   }
 }
 
@@ -26,7 +25,7 @@
   animation: gradient-x 15s ease infinite;
 }
 
-@keyframes scale-up {
+@keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
