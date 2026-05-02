@@ -25,8 +25,8 @@ self.addEventListener('push', (event) => {
     event.waitUntil(
       self.registration.showNotification(title || 'New Notification', {
         body: body || '',
-        icon: '/logo.png',
-        badge: '/logo.png',
+        icon: '/logo-128.png',
+        badge: '/badge-96.png',
         data: data || {},
         requireInteraction: true
       })
