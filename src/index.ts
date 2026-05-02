@@ -8,85 +8,114 @@ export { PushSubscriptionStore };
 
 /**
  * Factory to create a fresh MCP server instance for each request.
- * This prevents "Already connected to a transport" errors in stateless environments.
+ * If a clientId is provided (from the URL path), the tool requires no clientId argument.
+ * If no clientId, the tool accepts it as an explicit parameter (legacy /mcp endpoint).
  */
-function createMcpServer(env: Env) {
+function createMcpServer(env: Env, boundClientId?: string) {
   const server = new McpServer({
     name: "webpush-native-mcp",
     version: "1.0.0",
   });
 
-  server.tool(
-    "send_notification",
-    "Send a browser push notification to a registered client",
-    {
-      clientId: z.string().describe("Unique client ID from subscription page"),
-      title: z.string().max(200).describe("Notification title"),
-      body: z.string().max(4000).describe("Notification body text"),
-      url: z.string().url().optional().describe("URL to open on click"),
-    },
-    async ({ clientId, title, body, url }) => {
-      const stub = env.PUSH_STORE.get(env.PUSH_STORE.idFromName(clientId));
-      const sub = await stub.getSubscription(clientId);
-      if (!sub) return { content: [{ type: "text", text: `Client ${clientId} not found` }], isError: true };
-
-      try {
-        const message = await buildPushPayload(
-          {
-            data: JSON.stringify({ 
-              title, 
-              body, 
-              data: { url: url || "/" } 
-            })
-          },
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth }
-          },
-          {
-            subject: env.VAPID_SUBJECT,
-            publicKey: env.VAPID_PUBLIC_KEY,
-            privateKey: env.VAPID_PRIVATE_KEY
-          }
-        );
-        
-        const res = await fetch(sub.endpoint, message);
-        const resText = await res.text();
-        
-        if (!res.ok) {
-          return { 
-            content: [{ type: "text", text: `Push service error: ${res.status} ${resText}` }], 
-            isError: true 
-          };
-        }
-        
-        return { 
-          content: [{ 
-            type: "text", 
-            text: `Notification sent to ${clientId}. Service response: ${res.status} ${resText || "(no body)"}` 
-          }] 
-        };
-      } catch (e: any) {
-        return { content: [{ type: "text", text: `Error: ${e.message}` }], isError: true };
-      }
-    }
-  );
+  if (boundClientId) {
+    // Personalized endpoint: clientId is baked in from the URL — no parameter needed
+    server.tool(
+      "send_notification",
+      "Send a browser push notification to the owner of this MCP endpoint",
+      {
+        title: z.string().max(200).describe("Notification title"),
+        body: z.string().max(4000).describe("Notification body text"),
+        url: z.string().url().optional().describe("URL to open when the user clicks the notification"),
+      },
+      async ({ title, body, url }) => sendPush(env, boundClientId, title, body, url)
+    );
+  } else {
+    // Generic endpoint: clientId must be supplied as a tool argument
+    server.tool(
+      "send_notification",
+      "Send a browser push notification to a registered client",
+      {
+        clientId: z.string().describe("Unique client ID from the subscription page"),
+        title: z.string().max(200).describe("Notification title"),
+        body: z.string().max(4000).describe("Notification body text"),
+        url: z.string().url().optional().describe("URL to open when the user clicks the notification"),
+      },
+      async ({ clientId, title, body, url }) => sendPush(env, clientId, title, body, url)
+    );
+  }
 
   return server;
+}
+
+async function sendPush(
+  env: Env,
+  clientId: string,
+  title: string,
+  body: string,
+  url?: string
+) {
+  const stub = env.PUSH_STORE.get(env.PUSH_STORE.idFromName(clientId));
+  const sub = await stub.getSubscription(clientId);
+  if (!sub) return { content: [{ type: "text" as const, text: `Client ${clientId} not found` }], isError: true };
+
+  try {
+    const message = await buildPushPayload(
+      {
+        data: JSON.stringify({ 
+          title, 
+          body, 
+          data: { url: url || "/" } 
+        })
+      },
+      {
+        endpoint: sub.endpoint,
+        keys: { p256dh: sub.p256dh, auth: sub.auth }
+      },
+      {
+        subject: env.VAPID_SUBJECT,
+        publicKey: env.VAPID_PUBLIC_KEY,
+        privateKey: env.VAPID_PRIVATE_KEY
+      }
+    );
+    
+    const res = await fetch(sub.endpoint, message);
+    const resText = await res.text();
+    
+    if (!res.ok) {
+      return { 
+        content: [{ type: "text" as const, text: `Push service error: ${res.status} ${resText}` }], 
+        isError: true 
+      };
+    }
+    
+    return { 
+      content: [{ 
+        type: "text" as const, 
+        text: `Notification sent successfully. Service response: ${res.status}` 
+      }] 
+    };
+  } catch (e: any) {
+    return { content: [{ type: "text" as const, text: `Error: ${e.message}` }], isError: true };
+  }
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
-    // Standard MCP JSON-RPC over HTTP
-    if (url.pathname === "/mcp") {
+    // Personalized MCP endpoint: /mcp/:clientId
+    const personalizedMatch = url.pathname.match(/^\/mcp\/([\w-]+)$/);
+    const isMcpRequest = url.pathname === "/mcp" || personalizedMatch;
+
+    if (isMcpRequest) {
+      const boundClientId = personalizedMatch ? personalizedMatch[1] : undefined;
+
       const transport = new WebStandardStreamableHTTPServerTransport({
         sessionIdGenerator: undefined, // Stateless mode
         enableJsonResponse: true
       });
 
-      const server = createMcpServer(env);
+      const server = createMcpServer(env, boundClientId);
       await server.connect(transport);
 
       const modifiedRequest = new Request(request, {

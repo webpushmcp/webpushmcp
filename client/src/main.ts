@@ -22,6 +22,8 @@ const elements = {
   copyMcpBtn: document.getElementById('copy-mcp-btn')!,
   testPushBtn: document.getElementById('test-push-btn')! as HTMLButtonElement,
   unsubscribeBtn: document.getElementById('unsubscribe-btn')! as HTMLButtonElement,
+  configLocked: document.getElementById('config-locked')!,
+  configUnlocked: document.getElementById('config-unlocked')!,
 };
 
 function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', message: string) {
@@ -36,9 +38,13 @@ function updateStatus(status: 'idle' | 'subscribed' | 'error' | 'loading', messa
   if (status === 'subscribed') {
     elements.subscribeBtn.classList.add('hidden');
     elements.clientIdCard.classList.remove('hidden');
+    elements.configLocked.classList.add('hidden');
+    elements.configUnlocked.classList.remove('hidden');
   } else {
     elements.subscribeBtn.classList.remove('hidden');
     elements.clientIdCard.classList.add('hidden');
+    elements.configLocked.classList.remove('hidden');
+    elements.configUnlocked.classList.add('hidden');
   }
 }
 
@@ -49,6 +55,9 @@ async function init() {
   document.querySelectorAll('.mcp-url-placeholder').forEach(el => {
     el.textContent = mcpUrl;
   });
+
+  // Show locked config by default
+  elements.configLocked.classList.remove('hidden');
   
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     updateStatus('error', 'Push notifications not supported in this browser.');
@@ -64,6 +73,10 @@ async function init() {
     
     if (subscription && savedClientId) {
       elements.clientIdDisplay.textContent = savedClientId;
+      const personalizedUrl = window.location.origin + '/mcp/' + savedClientId;
+      elements.mcpUrlDisplay.textContent = personalizedUrl;
+      document.querySelectorAll('.mcp-url-placeholder').forEach(el => { el.textContent = personalizedUrl; });
+      document.querySelectorAll('.client-id-placeholder').forEach(el => { el.textContent = savedClientId; });
       updateStatus('subscribed', 'Notifications enabled');
     } else {
       updateStatus('idle', 'Not registered');
@@ -96,6 +109,10 @@ async function subscribe() {
     const { clientId } = await subResponse.json() as { clientId: string };
     localStorage.setItem('push_mcp_clientId', clientId);
     elements.clientIdDisplay.textContent = clientId;
+    const personalizedUrl = window.location.origin + '/mcp/' + clientId;
+    elements.mcpUrlDisplay.textContent = personalizedUrl;
+    document.querySelectorAll('.mcp-url-placeholder').forEach(el => { el.textContent = personalizedUrl; });
+    document.querySelectorAll('.client-id-placeholder').forEach(el => { el.textContent = clientId; });
     
     updateStatus('subscribed', 'Successfully registered!');
   } catch (err) {
