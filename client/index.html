@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="/src/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
     
     <!-- AIO: Structured Data for AI Discovery -->
     <script type="application/ld+json">
@@ -46,12 +47,12 @@
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
             </span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Free & Open Source</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-indigo-400">Free & Open Source</span>
         </div>
         
         <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-8">
             <div class="p-3 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl shadow-indigo-500/10">
-                <img src="/logo.png" alt="Logo" class="w-12 h-12 md:w-16 md:h-16">
+                <img src="/logo-128.png" alt="Native Push MCP Logo" width="64" height="64" class="w-12 h-12 md:w-16 md:h-16">
             </div>
             <div class="text-center md:text-left">
                 <h1 class="font-outfit text-4xl md:text-6xl font-bold tracking-tight text-white">
@@ -89,28 +90,28 @@
 
                 <div id="client-id-card" class="hidden space-y-4 animate-in slide-in-from-right duration-500 bg-slate-950/40 p-5 rounded-2xl border border-white/5">
                     <div class="space-y-1.5">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">Your Client ID</label>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Your Client ID</span>
                         <div class="group relative flex items-center bg-slate-950 rounded-xl border border-white/10 p-3 transition-colors hover:border-indigo-500/50">
                             <code id="client-id-display" class="text-indigo-400 font-mono text-xs overflow-hidden text-ellipsis">Generating...</code>
-                            <button id="copy-id-btn" class="ml-auto p-1.5 text-slate-500 hover:text-white transition-colors" title="Copy ID">
+                            <button id="copy-id-btn" class="ml-auto p-1.5 text-slate-500 hover:text-white transition-colors" title="Copy ID" aria-label="Copy Client ID">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                             </button>
                         </div>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 ml-1">MCP Endpoint</label>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">MCP Endpoint</span>
                         <div class="group relative flex items-center bg-slate-950 rounded-xl border border-white/10 p-3 transition-colors hover:border-indigo-500/50">
                             <code id="mcp-url-display" class="text-violet-400 font-mono text-xs overflow-hidden text-ellipsis">http://.../mcp</code>
-                            <button id="copy-mcp-btn" class="ml-auto p-1.5 text-slate-500 hover:text-white transition-colors" title="Copy URL">
+                            <button id="copy-mcp-btn" class="ml-auto p-1.5 text-slate-500 hover:text-white transition-colors" title="Copy URL" aria-label="Copy MCP Endpoint URL">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                             </button>
                         </div>
                     </div>
                     <div class="flex gap-3">
-                      <button id="test-push-btn" class="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-xl shadow-xl shadow-indigo-900/20 hover:shadow-indigo-500/20 transition-all text-xs">
+                      <button id="test-push-btn" class="flex-1 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-xl shadow-xl shadow-indigo-900/20 hover:shadow-indigo-500/20 transition-all text-xs">
                           Send Test
                       </button>
-                      <button id="unsubscribe-btn" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold rounded-xl transition-all text-xs">
+                      <button id="unsubscribe-btn" class="px-4 py-4 bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold rounded-xl transition-all text-xs">
                           Unsubscribe
                       </button>
                     </div>
@@ -131,7 +132,7 @@
                         </div>
                         <h3 class="font-bold text-white text-sm">Claude Desktop</h3>
                     </div>
-                    <p class="text-[11px] text-slate-500">Add to your <code class="text-slate-300">claude_desktop_config.json</code>:</p>
+                    <p class="text-xs text-slate-400">Add to your <code class="text-slate-300">claude_desktop_config.json</code>:</p>
                     <div class="relative group">
                         <pre class="bg-slate-950 p-4 rounded-xl border border-white/5 text-[10px] text-indigo-300 font-mono overflow-x-auto">
 {
@@ -152,7 +153,7 @@
                         </div>
                         <h3 class="font-bold text-white text-sm">Cursor / IDEs</h3>
                     </div>
-                    <ul class="text-[11px] text-slate-500 space-y-2 list-disc list-inside">
+                    <ul class="text-xs text-slate-400 space-y-2 list-disc list-inside">
                         <li>Open <span class="text-slate-300">Settings > Features > MCP</span></li>
                         <li>Click <span class="text-slate-300">+ Add Server</span></li>
                         <li>Type: <span class="text-indigo-400 font-bold">SSE</span></li>
@@ -202,7 +203,7 @@
                 </div>
                 <div>
                     <h4 class="text-white font-bold text-sm mb-1">Open Source & Free</h4>
-                    <p class="text-slate-400 text-[11px] leading-relaxed">Built for the community. Use for free, forever. Deploy yourself or use ours.</p>
+                    <p class="text-slate-400 text-xs leading-relaxed">Built for the community. Use for free, forever. Deploy yourself or use ours.</p>
                 </div>
             </div>
             <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 flex gap-4 items-start">
@@ -211,17 +212,17 @@
                 </div>
                 <div>
                     <h4 class="text-white font-bold text-sm mb-1">No Account Needed</h4>
-                    <p class="text-slate-400 text-[11px] leading-relaxed">No emails, no data collection. Just click enable and start receiving.</p>
+                    <p class="text-slate-400 text-xs leading-relaxed">No emails, no data collection. Just click enable and start receiving.</p>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="relative z-10 max-w-5xl mx-auto px-6 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-[10px]">
+    <footer class="relative z-10 max-w-5xl mx-auto px-6 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs">
         <p>&copy; 2026 Native Push MCP. Cloudflare Edge Powered.</p>
         <div class="flex gap-4">
-          <a href="https://github.com/bernd/webpush-native-mcp" target="_blank" class="hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold">GitHub</a>
+          <a href="https://github.com/bernd/webpush-native-mcp" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold">GitHub</a>
           <a href="/manifest.json" class="hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold">Manifest</a>
         </div>
     </footer>
